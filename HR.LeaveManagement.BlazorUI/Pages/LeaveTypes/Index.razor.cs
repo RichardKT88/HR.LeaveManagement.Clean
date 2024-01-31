@@ -11,8 +11,8 @@ public partial class Index
 
     [Inject]
     public ILeaveTypeService LeaveTypeService { get; set; }
-    [Inject]
-    public ILeaveAllocationService LeaveAllocationService { get; set; }
+    /*[Inject]
+    public ILeaveAllocationService LeaveAllocationService { get; set; }*/
     //[Inject]
     //IToastService toastService { get; set; }
     public List<LeaveTypeVM> LeaveTypes { get; private set; }

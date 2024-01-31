@@ -1,7 +1,7 @@
 ﻿using HR.LeaveManagement.Application.Contracts.Email;
 using HR.LeaveManagement.Application.Contracts.Persistence;
 using HR.LeaveManagement.Application.Exceptions;
-using HR.LeaveManagement.Application.Models;
+using HR.LeaveManagement.Application.Models.Email;
 using MediatR;
 
 namespace HR.LeaveManagement.Application.Features.LeaveRequest.Commands.CancelLeaveRequest;
