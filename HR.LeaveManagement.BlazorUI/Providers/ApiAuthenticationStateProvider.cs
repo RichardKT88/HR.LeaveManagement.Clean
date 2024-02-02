@@ -7,30 +7,30 @@ namespace HR.LeaveManagement.BlazorUI.Providers;
 
 public class ApiAuthenticationStateProvider : AuthenticationStateProvider
 {
-    private readonly ILocalStorageService localStorage;
+    private readonly ILocalStorageService _localStorage;
     private readonly JwtSecurityTokenHandler jwtSecurityTokenHandler;
 
     public ApiAuthenticationStateProvider(ILocalStorageService localStorage)
     {
-        this.localStorage = localStorage;
+        _localStorage = localStorage;
         jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
         var user = new ClaimsPrincipal(new ClaimsIdentity());
-        var isTokenPresent = await localStorage.ContainKeyAsync("token");
+        var isTokenPresent = await _localStorage.ContainKeyAsync("token");
         if (isTokenPresent == false)
         {
             return new AuthenticationState(user);
         }
 
-        var savedToken = await localStorage.GetItemAsync<string>("token");
+        var savedToken = await _localStorage.GetItemAsync<string>("token");
         var tokenContent = jwtSecurityTokenHandler.ReadJwtToken(savedToken);
 
-        if (tokenContent.ValidTo < DateTime.Now)
+        if (tokenContent.ValidTo.ToLocalTime() < DateTime.Now)
         {
-            await localStorage.RemoveItemAsync("token");
+            await _localStorage.RemoveItemAsync("token");
             return new AuthenticationState(user);
         }
 
@@ -51,7 +51,7 @@ public class ApiAuthenticationStateProvider : AuthenticationStateProvider
 
     public async Task LoggedOut()
     {
-        await localStorage.RemoveItemAsync("token");
+        await _localStorage.RemoveItemAsync("token");
         var nobody = new ClaimsPrincipal(new ClaimsIdentity());
         var authState = Task.FromResult(new AuthenticationState(nobody));
         NotifyAuthenticationStateChanged(authState);
@@ -59,7 +59,7 @@ public class ApiAuthenticationStateProvider : AuthenticationStateProvider
 
     private async Task<List<Claim>> GetClaims()
     {
-        var savedToken = await localStorage.GetItemAsync<string>("token");
+        var savedToken = await _localStorage.GetItemAsync<string>("token");
         var tokenContent = jwtSecurityTokenHandler.ReadJwtToken(savedToken);
         var claims = tokenContent.Claims.ToList();
         claims.Add(new Claim(ClaimTypes.Name, tokenContent.Subject));
