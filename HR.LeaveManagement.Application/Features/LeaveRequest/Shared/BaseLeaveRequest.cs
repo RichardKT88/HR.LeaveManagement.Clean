@@ -1,4 +1,4 @@
-﻿namespace HR.LeaveManagement.Application.DTOs.LeaveRequest;
+﻿namespace HR.LeaveManagement.Application.Features.LeaveRequest.Shared;
 
 public abstract class BaseLeaveRequest
 {

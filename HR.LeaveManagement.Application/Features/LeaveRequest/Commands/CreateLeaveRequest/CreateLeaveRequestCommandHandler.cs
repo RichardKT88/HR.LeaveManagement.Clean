@@ -2,13 +2,11 @@
 using HR.LeaveManagement.Application.Contracts.Email;
 using HR.LeaveManagement.Application.Contracts.Identity;
 using HR.LeaveManagement.Application.Contracts.Persistence;
-using HR.LeaveManagement.Application.DTOs.LeaveRequest.Validators;
 using HR.LeaveManagement.Application.Exceptions;
-using HR.LeaveManagement.Application.Features.LeaveRequests.Requests.Commands;
 using HR.LeaveManagement.Application.Models.Email;
 using MediatR;
 
-namespace HR.LeaveManagement.Application.Features.LeaveRequests.Handlers.Commands;
+namespace HR.LeaveManagement.Application.Features.Commands.CreateLeaveRequest;
 
 public class CreateLeaveRequestCommandHandler : IRequestHandler<CreateLeaveRequestCommand, Unit>
 {

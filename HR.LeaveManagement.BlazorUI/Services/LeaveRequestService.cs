@@ -51,7 +51,6 @@ public class LeaveRequestService : BaseHttpService, ILeaveRequestService
     {
         try
         {
-            //await AddBearerToken();
             var response = new Response<Guid>();
             CreateLeaveRequestCommand createLeaveRequest = _mapper.Map<CreateLeaveRequestCommand>(leaveRequest);
 

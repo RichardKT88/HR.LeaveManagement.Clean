@@ -1,57 +1,54 @@
 ﻿using AutoMapper;
 using HR.LeaveManagement.Application.Contracts.Identity;
 using HR.LeaveManagement.Application.Contracts.Persistence;
-using HR.LeaveManagement.Application.DTOs.LeaveRequest;
-using HR.LeaveManagement.Application.Features.LeaveRequest.Queries.GetLeaveRequestList;
 using MediatR;
 
-namespace HR.LeaveManagement.Application.Features.LeaveRequests.Handlers.Queries
+namespace HR.LeaveManagement.Application.Features.LeaveRequest.Queries.GetLeaveRequestList;
+
+public class GetLeaveRequestListQueryHandler : IRequestHandler<GetLeaveRequestListQuery, List<LeaveRequestListDto>>
 {
-    public class GetLeaveRequestListQueryHandler : IRequestHandler<GetLeaveRequestListQuery, List<LeaveRequestListDto>>
+    private readonly ILeaveRequestRepository _leaveRequestRepository;
+    private readonly IMapper _mapper;
+    private readonly IUserService _userService;
+
+    public GetLeaveRequestListQueryHandler(ILeaveRequestRepository leaveRequestRepository,
+        IMapper mapper,
+        IUserService userService)
     {
-        private readonly ILeaveRequestRepository _leaveRequestRepository;
-        private readonly IMapper _mapper;
-        private readonly IUserService _userService;
+        _leaveRequestRepository = leaveRequestRepository;
+        _mapper = mapper;
+        _userService = userService;
+    }
 
-        public GetLeaveRequestListQueryHandler(ILeaveRequestRepository leaveRequestRepository,
-            IMapper mapper,
-            IUserService userService)
+    public async Task<List<LeaveRequestListDto>> Handle(GetLeaveRequestListQuery request, CancellationToken cancellationToken)
+    {
+
+        var leaveRequests = await _leaveRequestRepository.GetLeaveRequestsWithDetails();
+        var requests = new List<LeaveRequestListDto>();
+
+        // Check if it is logged in employee
+        if (request.IsLoggedInUser)
         {
-            _leaveRequestRepository = leaveRequestRepository;
-            _mapper = mapper;
-            _userService = userService;
-        }
+            var userId = _userService.UserId;
+            leaveRequests = await _leaveRequestRepository.GetLeaveRequestsWithDetails(userId);
 
-        public async Task<List<LeaveRequestListDto>> Handle(GetLeaveRequestListQuery request, CancellationToken cancellationToken)
+            var employee = await _userService.GetEmployee(userId);
+            requests = _mapper.Map<List<LeaveRequestListDto>>(leaveRequests);
+            foreach (var req in requests)
+            {
+                req.Employee = employee;
+            }
+        }
+        else
         {
-             
-            var leaveRequests = await _leaveRequestRepository.GetLeaveRequestsWithDetails();
-            var requests = new List<LeaveRequestListDto>();
-
-            // Check if it is logged in employee
-            if (request.IsLoggedInUser)
+            leaveRequests = await _leaveRequestRepository.GetLeaveRequestsWithDetails();
+            requests = _mapper.Map<List<LeaveRequestListDto>>(leaveRequests);
+            foreach (var req in requests)
             {
-                var userId = _userService.UserId;
-                leaveRequests = await _leaveRequestRepository.GetLeaveRequestsWithDetails(userId);
-
-                var employee = await _userService.GetEmployee(userId);
-                requests = _mapper.Map<List<LeaveRequestListDto>>(leaveRequests);
-                foreach (var req in requests)
-                {
-                    req.Employee = employee;
-                }
+                req.Employee = await _userService.GetEmployee(req.RequestingEmployeeId);
             }
-            else
-            {
-                leaveRequests = await _leaveRequestRepository.GetLeaveRequestsWithDetails();
-                requests = _mapper.Map<List<LeaveRequestListDto>>(leaveRequests);
-                foreach (var req in requests)
-                {
-                    req.Employee = await _userService.GetEmployee(req.RequestingEmployeeId);
-                }
-            }
-            // Fill requests with employee information
-            return requests; 
         }
+        // Fill requests with employee information
+        return requests;
     }
 }

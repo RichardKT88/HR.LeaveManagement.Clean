@@ -1,7 +1,7 @@
-﻿using HR.LeaveManagement.Application.DTOs.LeaveRequest;
+﻿using HR.LeaveManagement.Application.Features.LeaveRequest.Shared;
 using MediatR;
 
-namespace HR.LeaveManagement.Application.Features.LeaveRequests.Requests.Commands;
+namespace HR.LeaveManagement.Application.Features.Commands.CreateLeaveRequest;
 
 public class CreateLeaveRequestCommand : BaseLeaveRequest, IRequest<Unit>
 {
